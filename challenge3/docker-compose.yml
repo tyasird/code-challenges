@@ -1,0 +1,55 @@
+version: '3'
+# create 2 different network
+networks:
+  sharedNetwork: # DB + ServerA
+  servers:       # ServerA + ServerB
+services:
+
+  # Database
+  db:
+    image: mysql/mysql-server:latest
+    volumes:
+      - ./serverDB:/var/lib/mysql
+    restart: always
+    # variables for mysql installation
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: database
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    networks:
+      -  sharedNetwork
+
+  # ServerA    
+  servera:
+    depends_on:
+      db:
+        condition: service_healthy
+    build:
+      context: ./serverA
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    volumes:
+      - ./serverA:/home
+    ports:
+      - '4000:80'
+    networks:
+      - sharedNetwork
+      - servers
+
+  # ServerB
+  serverb:
+    depends_on:
+      - servera
+    build:
+      context: ./serverB
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    volumes:
+      - ./serverB:/home
+    ports:
+      - '3000:80'
+    networks:
+      - servers
+
+
