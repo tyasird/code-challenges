@@ -1,5 +1,3 @@
-***"To get something you never had, you have to do something you never did." - José N. Harris***
-
 ## Code challenge 1: Directed Acyclic Graph
 Python script to find depth of given node n.
 
